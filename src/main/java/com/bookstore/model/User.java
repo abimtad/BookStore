@@ -35,4 +35,7 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ShoppingCart shoppingCart;
+
+    @Column(name = "is_admin")
+    private boolean isAdmin;
 } 
