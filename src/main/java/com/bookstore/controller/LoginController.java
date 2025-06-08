@@ -26,16 +26,21 @@ public class LoginController {
     
     @FXML
     private void handleLogin() {
+        System.out.println("Login button clicked");
         String username = usernameField.getText();
         String password = passwordField.getText();
-        
-        User user = userService.authenticate(username, password);
-        if (user != null) {
-            // Load appropriate view based on user role
-            String fxmlFile = user.isAdmin() ? "/fxml/admin_dashboard.fxml" : "/fxml/customer_dashboard.fxml";
-            loadView(fxmlFile);
-        } else {
-            messageLabel.setText("Invalid username or password");
+        System.out.println("Attempting login for username: " + username);
+        try {
+            User user = userService.authenticate(username, password);
+            if (user != null) {
+                System.out.println("Login successful for user: " + user.getUsername());
+                loadView(user.isAdmin() ? "/fxml/admin_dashboard.fxml" : "/fxml/customer_dashboard.fxml");
+            } else {
+                messageLabel.setText("Invalid username or password");
+            }
+        } catch (Exception e) {
+            messageLabel.setText("Error during login: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -53,21 +58,17 @@ public class LoginController {
     }
     
     private void loadView(String fxmlFile) {
+        System.out.println("Loading view: " + fxmlFile);
         try {
-            System.out.println("Attempting to load view: " + fxmlFile);
-            URL resourceUrl = LoginController.class.getResource(fxmlFile);
-            if (resourceUrl == null) {
-                throw new RuntimeException("Could not find FXML file: " + fxmlFile);
-            }
-            System.out.println("Found FXML file at: " + resourceUrl);
-            FXMLLoader loader = new FXMLLoader(resourceUrl);
+            var resource = getClass().getResource(fxmlFile);
+            System.out.println("FXML resource: " + resource);
+            FXMLLoader loader = new FXMLLoader(resource);
             Parent root = loader.load();
-            Stage stage = (Stage) usernameField.getScene().getWindow();
+            Stage stage = (Stage) messageLabel.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (Exception e) {
-            System.err.println("Error loading view: " + e.getMessage());
-            e.printStackTrace();
             messageLabel.setText("Error loading view: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 } 

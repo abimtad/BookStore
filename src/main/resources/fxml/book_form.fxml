@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="10" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.bookstore.controller.BookFormController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Book Details" style="-fx-font-size: 24px;"/>
+    <Label fx:id="messageLabel" style="-fx-text-fill: blue;"/>
+
+    <GridPane vgap="10" hgap="10">
+        <Label text="Title:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="titleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Author:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="authorField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="ISBN:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="isbnField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Price:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="priceField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Stock:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="stockField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Publication Year:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <TextField fx:id="publicationYearField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <Label text="Categories:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <TextField fx:id="categoriesField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+        <Label text="Cover Image URL:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+        <TextField fx:id="coverImageUrlField" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+        <Label text="Description:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+        <TextArea fx:id="descriptionField" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel" onAction="#handleCancel"/>
+        <Button text="Save" onAction="#handleSave"/>
+    </HBox>
+</VBox> 

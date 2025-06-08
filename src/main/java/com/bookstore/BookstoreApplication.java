@@ -11,6 +11,7 @@ public class BookstoreApplication extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+        System.out.println("Starting application...");
         try {
             // Initialize database
             System.out.println("Initializing database...");
@@ -19,10 +20,9 @@ public class BookstoreApplication extends Application {
             
             // Load the login view
             System.out.println("Loading login view...");
-            FXMLLoader loader = new FXMLLoader(BookstoreApplication.class.getResource("/fxml/login.fxml"));
-            if (loader.getLocation() == null) {
-                throw new RuntimeException("Could not find login.fxml");
-            }
+            var resource = getClass().getResource("/fxml/login.fxml");
+            System.out.println("login.fxml resource: " + resource);
+            FXMLLoader loader = new FXMLLoader(resource);
             Parent root = loader.load();
             
             Scene scene = new Scene(root);

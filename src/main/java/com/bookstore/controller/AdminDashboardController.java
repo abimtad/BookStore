@@ -14,8 +14,18 @@ public class AdminDashboardController {
 
     @FXML
     private void handleManageBooks() {
-        // TODO: Implement book management
-        messageLabel.setText("Book management coming soon!");
+        System.out.println("Manage Books button clicked");
+        try {
+            var resource = getClass().getResource("/fxml/book_management.fxml");
+            System.out.println("book_management.fxml resource: " + resource);
+            FXMLLoader loader = new FXMLLoader(resource);
+            Parent root = loader.load();
+            Stage stage = (Stage) messageLabel.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            messageLabel.setText("Error loading book management: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML

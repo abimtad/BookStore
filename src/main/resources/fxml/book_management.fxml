@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<VBox alignment="CENTER" spacing="10" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.bookstore.controller.BookManagementController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Book Management" style="-fx-font-size: 24px;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="searchField" promptText="Search books..." prefWidth="200"/>
+        <Button text="Search" onAction="#handleSearch"/>
+        <Button text="Add New Book" onAction="#handleAddBook"/>
+        <Button text="Back to Dashboard" onAction="#handleBackToDashboard"/>
+    </HBox>
+
+    <Label fx:id="messageLabel" style="-fx-text-fill: blue;"/>
+
+    <TableView fx:id="bookTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="50">
+                <cellValueFactory>
+                    <PropertyValueFactory property="id"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="titleColumn" text="Title" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="title"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="authorColumn" text="Author" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="author"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="isbnColumn" text="ISBN" prefWidth="120">
+                <cellValueFactory>
+                    <PropertyValueFactory property="isbn"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="priceColumn" text="Price" prefWidth="100">
+                <cellValueFactory>
+                    <PropertyValueFactory property="price"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="stockColumn" text="Stock" prefWidth="80">
+                <cellValueFactory>
+                    <PropertyValueFactory property="stock"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="yearColumn" text="Year" prefWidth="80">
+                <cellValueFactory>
+                    <PropertyValueFactory property="publicationYear"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150">
+                <cellFactory>
+                    <fx:factory method="createButtonCell"/>
+                </cellFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+</VBox> 

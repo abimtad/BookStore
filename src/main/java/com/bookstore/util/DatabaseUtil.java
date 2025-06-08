@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 public class DatabaseUtil {
     private static final String URL = "jdbc:mysql://localhost:3306/bookstore?createDatabaseIfNotExist=true";
@@ -11,6 +16,8 @@ public class DatabaseUtil {
     private static final String PASSWORD = "root_password"; // Updated password for root user
     
     private static Connection connection;
+    private static EntityManagerFactory entityManagerFactory;
+    private static EntityManager entityManager;
     
     public static Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
@@ -44,76 +51,112 @@ public class DatabaseUtil {
             System.err.println("Error closing connection: " + e.getMessage());
             e.printStackTrace();
         }
+        if (entityManager != null && entityManager.isOpen()) {
+            entityManager.close();
+        }
+        if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
+            entityManagerFactory.close();
+        }
     }
     
     public static void initializeDatabase() {
-        try (Connection conn = getConnection()) {
-            System.out.println("Initializing database...");
-            
-            // Create tables if they don't exist
-            String createUsersTable = """
-                CREATE TABLE IF NOT EXISTS users (
-                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    username VARCHAR(50) UNIQUE NOT NULL,
-                    password VARCHAR(255) NOT NULL,
-                    email VARCHAR(100) UNIQUE NOT NULL,
-                    is_admin BOOLEAN DEFAULT FALSE
-                )
-            """;
-            
-            String createBooksTable = """
-                CREATE TABLE IF NOT EXISTS books (
-                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    title VARCHAR(255) NOT NULL,
-                    author VARCHAR(255) NOT NULL,
-                    price DECIMAL(10,2) NOT NULL,
-                    stock INT NOT NULL,
-                    description TEXT
-                )
-            """;
-            
-            String createOrdersTable = """
-                CREATE TABLE IF NOT EXISTS orders (
-                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    user_id BIGINT NOT NULL,
-                    order_date DATETIME NOT NULL,
-                    total_amount DECIMAL(10,2) NOT NULL,
-                    status VARCHAR(20) NOT NULL,
-                    FOREIGN KEY (user_id) REFERENCES users(id)
-                )
-            """;
-            
-            String createOrderItemsTable = """
-                CREATE TABLE IF NOT EXISTS order_items (
-                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    order_id BIGINT NOT NULL,
-                    book_id BIGINT NOT NULL,
-                    quantity INT NOT NULL,
-                    price DECIMAL(10,2) NOT NULL,
-                    FOREIGN KEY (order_id) REFERENCES orders(id),
-                    FOREIGN KEY (book_id) REFERENCES books(id)
-                )
-            """;
-            
-            try (Statement stmt = conn.createStatement()) {
-                stmt.execute(createUsersTable);
-                stmt.execute(createBooksTable);
-                stmt.execute(createOrdersTable);
-                stmt.execute(createOrderItemsTable);
-                System.out.println("Tables created successfully");
+        try {
+            // Create database if it doesn't exist
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+                Statement stmt = conn.createStatement();
+                stmt.execute("CREATE DATABASE IF NOT EXISTS bookstore");
+                System.out.println("Database created or already exists");
+            }
+
+            // Create tables
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+                Statement stmt = conn.createStatement();
                 
-                // Insert admin user if not exists
-                String insertAdmin = """
+                // Create users table
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        username VARCHAR(50) UNIQUE NOT NULL,
+                        password VARCHAR(100) NOT NULL,
+                        email VARCHAR(100) UNIQUE NOT NULL,
+                        is_admin BOOLEAN DEFAULT FALSE
+                    )
+                """);
+                System.out.println("Users table created or already exists");
+                
+                // Create books table
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS books (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        title VARCHAR(255) NOT NULL,
+                        author VARCHAR(255) NOT NULL,
+                        isbn VARCHAR(13) UNIQUE,
+                        price DECIMAL(10,2) NOT NULL,
+                        stock INT NOT NULL,
+                        description TEXT
+                    )
+                """);
+                System.out.println("Books table created or already exists");
+                
+                // Create orders table
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS orders (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        user_id BIGINT NOT NULL,
+                        total_amount DECIMAL(10,2) NOT NULL,
+                        status VARCHAR(20) NOT NULL,
+                        order_date DATETIME NOT NULL,
+                        shipping_address TEXT,
+                        FOREIGN KEY (user_id) REFERENCES users(id)
+                    )
+                """);
+                System.out.println("Orders table created or already exists");
+                
+                // Create order_items table
+                stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS order_items (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        order_id BIGINT NOT NULL,
+                        book_id BIGINT NOT NULL,
+                        quantity INT NOT NULL,
+                        price DECIMAL(10,2) NOT NULL,
+                        FOREIGN KEY (order_id) REFERENCES orders(id),
+                        FOREIGN KEY (book_id) REFERENCES books(id)
+                    )
+                """);
+                System.out.println("Order items table created or already exists");
+                
+                // Create admin user if it doesn't exist
+                stmt.execute("""
                     INSERT IGNORE INTO users (username, password, email, is_admin)
                     VALUES ('admin', 'admin123', 'admin@bookstore.com', TRUE)
-                """;
-                stmt.execute(insertAdmin);
+                """);
                 System.out.println("Admin user created/verified");
             }
             
+            System.out.println("Database initialized successfully");
         } catch (SQLException e) {
             System.err.println("Error initializing database: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Failed to initialize database", e);
         }
+    }
+
+    public static EntityManager getEntityManager() {
+        if (entityManager == null || !entityManager.isOpen()) {
+            if (entityManagerFactory == null) {
+                Map<String, String> properties = new HashMap<>();
+                properties.put("jakarta.persistence.jdbc.url", URL);
+                properties.put("jakarta.persistence.jdbc.user", USER);
+                properties.put("jakarta.persistence.jdbc.password", PASSWORD);
+                properties.put("jakarta.persistence.jdbc.driver", "com.mysql.cj.jdbc.Driver");
+                properties.put("hibernate.hbm2ddl.auto", "update");
+                properties.put("hibernate.show_sql", "true");
+                
+                entityManagerFactory = Persistence.createEntityManagerFactory("bookstore", properties);
+            }
+            entityManager = entityManagerFactory.createEntityManager();
+        }
+        return entityManager;
     }
 } 
