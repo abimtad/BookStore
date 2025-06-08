@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.net.URL;
 
 public class LoginController {
     @FXML
@@ -41,7 +42,7 @@ public class LoginController {
     @FXML
     private void handleRegister() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
+            FXMLLoader loader = new FXMLLoader(LoginController.class.getResource("/fxml/register.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -53,13 +54,20 @@ public class LoginController {
     
     private void loadView(String fxmlFile) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            System.out.println("Attempting to load view: " + fxmlFile);
+            URL resourceUrl = LoginController.class.getResource(fxmlFile);
+            if (resourceUrl == null) {
+                throw new RuntimeException("Could not find FXML file: " + fxmlFile);
+            }
+            System.out.println("Found FXML file at: " + resourceUrl);
+            FXMLLoader loader = new FXMLLoader(resourceUrl);
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (Exception e) {
-            messageLabel.setText("Error loading view");
+            System.err.println("Error loading view: " + e.getMessage());
             e.printStackTrace();
+            messageLabel.setText("Error loading view: " + e.getMessage());
         }
     }
 } 

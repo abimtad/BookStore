@@ -19,7 +19,7 @@ public class BookstoreApplication extends Application {
             
             // Load the login view
             System.out.println("Loading login view...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(BookstoreApplication.class.getResource("/fxml/login.fxml"));
             if (loader.getLocation() == null) {
                 throw new RuntimeException("Could not find login.fxml");
             }
