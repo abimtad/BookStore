@@ -10,24 +10,43 @@ import javafx.stage.Stage;
 public class BookstoreApplication extends Application {
     
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        // Initialize database
-        DatabaseUtil.initializeDatabase();
-        
-        // Load the login view
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
-        Parent root = loader.load();
-        
-        Scene scene = new Scene(root);
-        primaryStage.setTitle("Bookstore Login");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    public void start(Stage primaryStage) {
+        try {
+            // Initialize database
+            System.out.println("Initializing database...");
+            DatabaseUtil.initializeDatabase();
+            System.out.println("Database initialized successfully");
+            
+            // Load the login view
+            System.out.println("Loading login view...");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            if (loader.getLocation() == null) {
+                throw new RuntimeException("Could not find login.fxml");
+            }
+            Parent root = loader.load();
+            
+            Scene scene = new Scene(root);
+            primaryStage.setTitle("Bookstore Login");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            System.out.println("Application started successfully");
+        } catch (Exception e) {
+            System.err.println("Error starting application: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
     
     @Override
     public void stop() {
-        // Close database connection when application closes
-        DatabaseUtil.closeConnection();
+        try {
+            // Close database connection when application closes
+            DatabaseUtil.closeConnection();
+            System.out.println("Database connection closed");
+        } catch (Exception e) {
+            System.err.println("Error closing database connection: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     public static void main(String[] args) {
