@@ -1,11 +1,36 @@
 package com.bookstore;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.bookstore.util.DatabaseUtil;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-@SpringBootApplication
-public class BookstoreApplication {
+public class BookstoreApplication extends Application {
+    
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        // Initialize database
+        DatabaseUtil.initializeDatabase();
+        
+        // Load the login view
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+        Parent root = loader.load();
+        
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Bookstore Login");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+    
+    @Override
+    public void stop() {
+        // Close database connection when application closes
+        DatabaseUtil.closeConnection();
+    }
+    
     public static void main(String[] args) {
-        SpringApplication.run(BookstoreApplication.class, args);
+        launch(args);
     }
 } 
